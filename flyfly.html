@@ -1,0 +1,161 @@
+fly.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draggable and Bouncing Image</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        #draggable {
+            position: absolute;
+            cursor: grab;
+        }
+    </style>
+</head>
+<body>
+    <img id="draggable" src="Screenshot 2024-12-22 112611.png" alt="Draggable Image" width="200">
+    <script></script>
+        const img = document.getElementById('draggable');
+        let isDragging = false;
+        let offsetX, offsetY;
+        
+        // Center the image initially
+        img.style.left = (window.innerWidth / 2 - img.clientWidth / 2) + 'px';
+        img.style.top = (window.innerHeight / 2 - img.clientHeight / 2) + 'px';
+
+        // Function to handle bouncing
+        function bounce() {
+            let x = parseInt(img.style.left);
+            let y = parseInt(img.style.top);
+            let dx = 1; // Slower speed
+            let dy = 1; // Slower speed
+
+            function animate() {
+                x += dx;
+                y += dy;
+
+                if (x <= 0 || x + img.clientWidth >= window.innerWidth) {
+                    dx = -dx;
+                }
+                if (y <= 0 || y + img.clientHeight >= window.innerHeight) {
+                    dy = -dy;
+                }
+
+                img.style.left = x + 'px';
+                img.style.top = y + 'px';
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        img.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            img.style.cursor = 'grabbing';
+            offsetX = e.clientX - img.offsetLeft;
+            offsetY = e.clientY - img.offsetTop;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                let x = e.clientX - offsetX;
+                let y = e.clientY - offsetY;
+
+                // Check for boundaries and bounce
+                if (x <= 0 || x + img.width >= window.innerWidth) {
+                    offsetX = e.clientX - img.offsetLeft;
+                    x = Math.max(0, Math.min(x, window.innerWidth - img.width));
+                }
+                if (y <= 0 || y + img.height >= window.innerHeight) {
+                    offsetY = e.clientY - img.offsetTop;
+                    y = Math.max(0, Math.min(y, window.innerHeight - img.height));
+                }
+
+                img.style.left = x + 'px';
+                img.style.top = y + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            img.style.cursor = 'grab';
+        });
+
+        // Call the bounce function to start the animation
+        bounce();
+    </script>
+    <script>
+        const img = document.getElementById('draggable');
+        let isDragging = false;
+        let offsetX, offsetY;
+        
+        // Center the image initially
+        img.style.left = (window.innerWidth / 2 - img.clientWidth / 2) + 'px';
+        img.style.top = (window.innerHeight / 2 - img.clientHeight / 2) + 'px';
+
+        // Function to handle bouncing
+        function bounce() {
+            let x = parseInt(img.style.left);
+            let y = parseInt(img.style.top);
+            let dx = 2;
+            let dy = 2;
+
+            function animate() {
+                x += dx;
+                y += dy;
+
+                if (x <= 0 || x + img.clientWidth >= window.innerWidth) {
+                    dx = -dx;
+                }
+                if (y <= 0 || y + img.clientHeight >= window.innerHeight) {
+                    dy = -dy;
+                }
+
+                img.style.left = x + 'px';
+                img.style.top = y + 'px';
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        img.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            img.style.cursor = 'grabbing';
+            offsetX = e.clientX - img.offsetLeft;
+            offsetY = e.clientY - img.offsetTop;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                let x = e.clientX - offsetX;
+                let y = e.clientY - offsetY;
+
+                // Check for boundaries and bounce
+                if (x <= 0 || x + img.width >= window.innerWidth) {
+                    offsetX = e.clientX - img.offsetLeft;
+                    x = Math.max(0, Math.min(x, window.innerWidth - img.width));
+                }
+                if (y <= 0 || y + img.height >= window.innerHeight) {
+                    offsetY = e.clientY - img.offsetTop;
+                    y = Math.max(0, Math.min(y, window.innerHeight - img.height));
+                }
+
+                img.style.left = x + 'px';
+                img.style.top = y + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            img.style.cursor = 'grab';
+        });
+
+        // Call the bounce function to start the animation
+        bounce();
+    </script>
+</body>
+</html>

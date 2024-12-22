@@ -8,7 +8,7 @@ This project demonstrates a bouncing DVD logo animation using HTML and CSS. It's
 
 ## Demo
 
-You can see a live demo of the project [here](https://your-demo-link.com).
+You can see the project [here](https://micahthepro.github.io/DVD-Bounce).
 
 ## Features
 
@@ -24,8 +24,4 @@ To get a local copy up and running, follow these simple steps.
 
 You need a web browser to view the project.
 
-### Installation
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/MicahThePro/DVD-Bounce.git
+ENJOY!

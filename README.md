@@ -16,10 +16,6 @@ You can see the project [here](https://micahthepro.github.io/DVD-Bounce).
 - Responsive design
 - Easy to customize
 
-## Getting Started
-
-To get a local copy up and running, follow these simple steps.
-
 ### Prerequisites
 
 You need a web browser to view the project.

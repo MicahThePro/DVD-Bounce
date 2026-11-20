@@ -4,7 +4,7 @@ A Bouncing DVD Logo made in HTML!
 
 ## Description
 
-This project demonstrates a bouncing DVD logo animation using HTML and CSS. It's a fun and nostalgic effect reminiscent of the classic DVD screensaver.
+This project demonstrates a bouncing DVD logo animation using HTML, CSS, and JavaScript. It's a fun and nostalgic effect reminiscent of the classic DVD screensaver.
 
 ## Website
 

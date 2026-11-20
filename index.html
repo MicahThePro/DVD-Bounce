@@ -4,103 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DVD Bounce</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <style>
         body {
             margin: 0;
             overflow: hidden;
             background-color: black;
         }
-        #draggable {
+        .logo {
             position: absolute;
-            cursor: grab;
+            left: 0;
+            top: 0;
+            width: 200px;
+            filter: invert(1);
+            user-select: none;
+            will-change: transform;
         }
     </style>
 </head>
 <body>
-    <img id="draggable" src="dvd-logo.svg" alt="Draggable Image" width="200" style="filter: invert(1);">
     <script>
-        const img = document.getElementById('draggable');
-        let isDragging = false;
-        let offsetX, offsetY;
-        const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'magenta'];
+        const SVG_SRC = 'dvd-logo.svg';
+        const LOGO_WIDTH = 200;   // px
+        const SPEED = 120;        // px per second
 
-        // Center the image initially
-        img.style.left = (window.innerWidth / 2 - img.clientWidth / 2) + 'px';
-        img.style.top = (window.innerHeight / 2 - img.clientHeight / 2) + 'px';
+        const logos = [];
+        let logoHeight = 0;
+        let ready = false;
+        let lastTime = null;
 
-        // Function to handle bouncing
-        function bounce() {
-            let x = parseInt(img.style.left);
-            let y = parseInt(img.style.top);
-            let dx = 2;
-            let dy = 2;
-
-            function animate() {
-                x += dx;
-                y += dy;
-
-                if (x <= 0 || x + img.clientWidth >= window.innerWidth) {
-                    dx = -dx;
-                    changeColor();
-                }
-                if (y <= 0 || y + img.clientHeight >= window.innerHeight) {
-                    dy = -dy;
-                    changeColor();
-                }
-
-                img.style.left = x + 'px';
-                img.style.top = y + 'px';
-                requestAnimationFrame(animate);
-            }
-            animate();
+        // Pick a random color for a logo
+        function randomColorFilter() {
+            const hue = Math.floor(Math.random() * 360);
+            return `invert(1) sepia(1) saturate(10000%) hue-rotate(${hue}deg)`;
         }
 
-        function changeColor() {
-            let newColor;
-            do {
-                newColor = colors[Math.floor(Math.random() * colors.length)];
-            } while (newColor === 'black');
-            img.style.filter = `invert(1) sepia(1) saturate(10000%) hue-rotate(${Math.random() * 360}deg)`;
+        // Create a new logo centered on (cx, cy), moving at the given angle
+        function spawnLogo(cx, cy, angle) {
+            const el = document.createElement('img');
+            el.src = SVG_SRC;
+            el.alt = 'DVD logo';
+            el.className = 'logo';
+            el.draggable = false;
+            el.style.width = LOGO_WIDTH + 'px';
+            el.style.height = logoHeight + 'px';
+            el.style.filter = randomColorFilter();
+            document.body.appendChild(el);
+
+            // Keep the new logo fully on screen
+            const x = Math.min(Math.max(0, cx - LOGO_WIDTH / 2), window.innerWidth - LOGO_WIDTH);
+            const y = Math.min(Math.max(0, cy - logoHeight / 2), window.innerHeight - logoHeight);
+
+            logos.push({
+                el,
+                x,
+                y,
+                dx: Math.cos(angle) * SPEED,
+                dy: Math.sin(angle) * SPEED
+            });
         }
 
-        img.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            img.style.cursor = 'grabbing';
-            offsetX = e.clientX - img.offsetLeft;
-            offsetY = e.clientY - img.offsetTop;
-        });
+        function randomAngle() {
+            return Math.random() * Math.PI * 2;
+        }
 
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                let x = e.clientX - offsetX;
-                let y = e.clientY - offsetY;
-
-                // Check for boundaries and bounce
-                if (x <= 0 || x + img.width >= window.innerWidth) {
-                    offsetX = e.clientX - img.offsetLeft;
-                    x = Math.max(0, Math.min(x, window.innerWidth - img.width));
-                }
-                if (y <= 0 || y + img.height >= window.innerHeight) {
-                    offsetY = e.clientY - img.offsetTop;
-                    y = Math.max(0, Math.min(y, window.innerHeight - img.height));
-                }
-
-                img.style.left = x + 'px';
-                img.style.top = y + 'px';
+        function animate(time) {
+            if (lastTime === null) {
+                lastTime = time;
             }
+
+            // Seconds since the last frame, capped so logos don't jump
+            // far if the tab was in the background.
+            const dt = Math.min((time - lastTime) / 1000, 0.05);
+            lastTime = time;
+
+            const maxX = window.innerWidth - LOGO_WIDTH;
+            const maxY = window.innerHeight - logoHeight;
+
+            for (const logo of logos) {
+                logo.x += logo.dx * dt;
+                logo.y += logo.dy * dt;
+
+                // Bounce off the left/right edges
+                if (logo.x <= 0) {
+                    logo.x = 0;
+                    logo.dx = Math.abs(logo.dx);
+                    logo.el.style.filter = randomColorFilter();
+                } else if (logo.x >= maxX) {
+                    logo.x = Math.max(0, maxX);
+                    logo.dx = -Math.abs(logo.dx);
+                    logo.el.style.filter = randomColorFilter();
+                }
+
+                // Bounce off the top/bottom edges
+                if (logo.y <= 0) {
+                    logo.y = 0;
+                    logo.dy = Math.abs(logo.dy);
+                    logo.el.style.filter = randomColorFilter();
+                } else if (logo.y >= maxY) {
+                    logo.y = Math.max(0, maxY);
+                    logo.dy = -Math.abs(logo.dy);
+                    logo.el.style.filter = randomColorFilter();
+                }
+
+                logo.el.style.transform = `translate(${logo.x}px, ${logo.y}px)`;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Clicking anywhere spawns another logo going in a random direction
+        window.addEventListener('click', (e) => {
+            if (!ready) return;
+            spawnLogo(e.clientX, e.clientY, randomAngle());
         });
 
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            img.style.cursor = 'grab';
-        });
-
-        // Call the bounce function to start the animation
-        bounce();
+        // Measure the logo's height once the image has loaded, then start
+        // The SVG has no fixed pixel size, so let the browser size it at
+        // LOGO_WIDTH and read back the height it ends up with.
+        const measure = document.createElement('img');
+        measure.src = SVG_SRC;
+        measure.className = 'logo';
+        measure.style.width = LOGO_WIDTH + 'px';
+        measure.style.visibility = 'hidden';
+        document.body.appendChild(measure);
+        measure.onload = () => {
+            logoHeight = measure.offsetHeight;
+            measure.remove();
+            ready = true;
+            spawnLogo(window.innerWidth / 2, window.innerHeight / 2, randomAngle());
+            requestAnimationFrame(animate);
+        };
     </script>
 </body>
 </html>
-<script>
-    // Set initial random color
-    changeColor();
-</script>
